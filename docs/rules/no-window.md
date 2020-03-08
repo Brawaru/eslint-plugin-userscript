@@ -1,36 +1,45 @@
-# Disallows usage of window and requires to you unsafeWindow instead. (no-window)
+# Disallow usage of `window` global (no-window)
 
-Please describe the origin of the rule here.
-
+Disallows usage of `window` global and requires you to use `unsafeWindow` instead.
 
 ## Rule Details
 
-This rule aims to...
+Using `window` in userscripts is unreliable when targeting multiple userscript managers and may result in unintended side effects and bugs.
+
+It's better to scope userscript's variables in a IIFE function, and when access to actual window is necessary, use [`unsafeWindow`](https://wiki.greasespot.net/UnsafeWindow), giving you've declared permission to use it.
 
 Examples of **incorrect** code for this rule:
 
 ```js
+// Defining global variable:
 
-// fill me in
+Object.defineProperty(window, "myGlobal", {
+    value: "My global value!",
+});
 
+// Using window:
+
+window.cancelAnimationFrame(requestId);
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
+// Exposing variables:
 
-// fill me in
+Object.defineProperty(unsafeWindow, "myGlobal", {
+    value: "My exposed global value",
+});
 
+// Using window:
+
+unsafeWindow.cancelAnimationFrame(requestId);
 ```
-
-### Options
-
-If there are any options, describe them here. Otherwise, delete this section.
 
 ## When Not To Use It
 
-Give a short description of when it would be appropriate to turn off this rule.
+If you are targeting specific userscript manager and usage of `window` is always meets the expectation.
 
 ## Further Reading
 
-If there are other links that describe the issue this rule addresses, please include them here in a bulleted list.
+- Example of bug caused by using window in one of the dependencies: https://github.com/preactjs/preact/issues/2385
